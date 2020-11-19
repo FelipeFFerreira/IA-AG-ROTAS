@@ -1,15 +1,14 @@
-# TRB2-IA-AG-ROTAS
-Trabalho de algorítimo genético
+# TRB1-I.A
+- Trabalho de algorítimo genético
 
-## Integrantes
+## INTEGRANTES
 - Felipe Ferreira
 - Gabriel Romano
 - Jaime Mathias
-- Marcus Vinicius
 - Willy Pestana
+- Marcus Vinicius
 
-## Linguagens e Tecnologias
-- C
-- C#
-
+## LINGUAGENS E TECNOLOGIAS 
+- Linguagem C para lógica 
+- C# para interface
 

@@ -1,0 +1,62 @@
+# depslib dependency file v1.0
+1599610719 source:c:\github\trb1-ia-local\ag_rotas\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	<math.h>
+
+1599847596 source:c:\github\local-ga\ag_rotas\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	<math.h>
+
+1600036210 source:c:\github\trb2-ia\local-ga\ag_rotas\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"rotas.h"
+	<time.h>
+
+1600035966 source:c:\github\trb2-ia\local-ga\ag_rotas\rotas.c
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	<math.h>
+	"rotas.h"
+
+1600036391 c:\github\trb2-ia\local-ga\ag_rotas\rotas.h
+	<stdbool.h>
+
+1602719050 source:c:\github\trb2-ia\trb2-ia-ag-rotas\ag_rotas\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	"rotas.h"
+
+1602720545 c:\github\trb2-ia\trb2-ia-ag-rotas\ag_rotas\rotas.h
+	<stdbool.h>
+
+1600879579 D
+
+1602720839 source:c:\github\trb2-ia\trb2-ia-ag-rotas\ag_rotas\rotas.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	<math.h>
+	"rotas.h"
+
+1600877779 62b7d713f2189658d4a9475d649f8e2844efb
+
+1600802167 ent of bc6b8dd... adapta reavaliacao
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	<math.h>
+	"rotas.h"
+	<gmp.h>
+
