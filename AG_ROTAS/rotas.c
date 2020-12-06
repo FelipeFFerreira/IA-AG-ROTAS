@@ -313,11 +313,14 @@ void print_arq_rota()
     FILE *ptr_arq;
     ptr_arq = fopen("result_rota.txt","w");
     fprintf(ptr_arq , "%s", "v\n");
+
     pos_cromo(indice_notas[TAMPOP - 1], i_geraativa, &j);
-    for(k = 0; m_i_pop[QTGERA - 1][j][k]->dado != final.dado; k++) {
-        fprintf(ptr_arq , "%d\n", m_i_pop[QTGERA - 1][j][k]->dado);
+    for (k = 0; m_i_pop[QTGERA - 1][j][k]->dado != final.dado; k++) {
+        if (m_i_pop[QTGERA - 1][j][k]->dado == inicio.dado)
+            fprintf(ptr_arq , "i%di\n", m_i_pop[QTGERA - 1][j][k]->dado);
+        else fprintf(ptr_arq , "%d\n", m_i_pop[QTGERA - 1][j][k]->dado);
     }
-    fprintf(ptr_arq , "%d\n", m_i_pop[QTGERA - 1][j][k]->dado);
+    fprintf(ptr_arq , "f%df\n", m_i_pop[QTGERA - 1][j][k]->dado);
     fprintf(ptr_arq , "%s", "v\n");
     fclose(ptr_arq);
 }
