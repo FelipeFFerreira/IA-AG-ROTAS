@@ -6,8 +6,8 @@
 #include "rotas.h"
 
 faixas_roleta fx_roleta[TAMPOP];
-posicao inicio = {4, 0, 25};
-posicao final = {1, 5, 12};
+posicao inicio = {0, 0, 1};
+posicao final = {4, 5, 30};
 int i_geraativa = 0; //geracao atual
 posicao* m_i_pop[QTGERA][TAMPOP][TAMCROMO + 1] = {0, 0, 0}; //matriz de cromossomo
 unsigned long long int m_f_popaval[QTGERA][TAMPOP]; //matriz de avalia��es
@@ -308,19 +308,19 @@ void mostrapop(void) {
 
 void print_arq_rota()
 {
-    int k;
-    int j;
+    unsigned long long int k;
+    unsigned long long int j;
     FILE *ptr_arq;
-    ptr_arq = fopen("result_rota.txt","w");
-    fprintf(ptr_arq , "%s", "v\n");
+    ptr_arq = fopen("result_rota.json","w");
+    fprintf(ptr_arq , "%s", "[");
 
     pos_cromo(indice_notas[TAMPOP - 1], i_geraativa, &j);
     for (k = 0; m_i_pop[QTGERA - 1][j][k]->dado != final.dado; k++) {
         if (m_i_pop[QTGERA - 1][j][k]->dado == inicio.dado)
-            fprintf(ptr_arq , "i%di\n", m_i_pop[QTGERA - 1][j][k]->dado);
-        else fprintf(ptr_arq , "%d\n", m_i_pop[QTGERA - 1][j][k]->dado);
+            fprintf(ptr_arq , "%d,", m_i_pop[QTGERA - 1][j][k]->dado);
+        else fprintf(ptr_arq , "%d,", m_i_pop[QTGERA - 1][j][k]->dado);
     }
-    fprintf(ptr_arq , "f%df\n", m_i_pop[QTGERA - 1][j][k]->dado);
-    fprintf(ptr_arq , "%s", "v\n");
+    fprintf(ptr_arq , "%d", m_i_pop[QTGERA - 1][j][k]->dado);
+    fprintf(ptr_arq , "%s", "]\n");
     fclose(ptr_arq);
 }

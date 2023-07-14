@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(var(--cols), 2fr);
+            grid-gap: 1px;
+            width: var(--board-width);
+            height: var(--board-height);
+            background-color: white; 
+        }
+
+        .square {
+            width: var(--square-size);
+            height: var(--square-size);
+            position: relative;
+        }
+
+        .street {
+            background-color: lightgray; 
+        }
+
+        .building {
+            background-color: white;
+            width: calc(var(--square-size) / 2);
+            height: calc(var(--square-size) / 2);
+            margin: calc(var(--square-size) / 4);
+        }
+
+        .number, .info {
+            font-size: calc(var(--square-size) / 8);
+            position: absolute;
+            color: black;
+        }
+        
+        .number {
+            top: 0;
+            right: 0;
+        }
+        
+        .info {
+            bottom: 0;
+            left: 0;
+        }
+
+        .null-square {
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+
+<input type="file" id="file-input" />
+<input type="checkbox" id="single-run-checkbox" /> <label for="single-run-checkbox">Modo de execução única</label>
+<div class="board">
+    <script>
+        let ROWS = 5;
+        let COLS = 6;
+        let SQUARE_SIZE = 80; // size in pixels
+        let BOARD_WIDTH = ROWS * 2 * SQUARE_SIZE; // size in pixels
+        let BOARD_HEIGHT = COLS * 2 * SQUARE_SIZE; // size in pixels
+
+        // set CSS variables
+        document.documentElement.style.setProperty('--rows', ROWS * 2);
+        document.documentElement.style.setProperty('--cols', COLS * 2);
+        document.documentElement.style.setProperty('--square-size', `${SQUARE_SIZE}px`);
+        document.documentElement.style.setProperty('--board-width', `${BOARD_WIDTH}px`);
+        document.documentElement.style.setProperty('--board-height', `${BOARD_HEIGHT}px`);
+
+        let cont = 0;
+        let rowIndex = 0;
+        let colIndex = 0;
+        for (let i = 0; i < ROWS * 2; i++) { 
+            for (let j = 0; j < COLS * 2; j++) { 
+                let square = document.createElement('div');
+                square.className = 'square';
+                
+                if (i % 2 === 0 && j % 2 === 0) {
+                    // This is a 'street' square
+                    square.className += ' street';
+                    square.dataset.number = ++cont;
+                    square.dataset.row = rowIndex;
+                    square.dataset.col = colIndex;
+
+                    let building = document.createElement('div');
+                    building.className = 'building';
+                    square.appendChild(building);
+
+                    let number = document.createElement('div');
+                    number.className = 'number';
+                    number.textContent = cont;
+                    square.appendChild(number);
+
+                    let info = document.createElement('div');
+                    info.className = 'info';
+                    info.textContent = `L${rowIndex}C${colIndex}`;
+                    square.appendChild(info);
+                    
+                    if (j % 2 === 0) {
+                        colIndex++;
+                    }
+                } else if (i % 2 !== 0 && j % 2 !== 0) {
+                    // This is a 'null' square
+                    square.className += ' null-square';
+                }
+
+                document.querySelector('.board').appendChild(square);
+            }
+            if (i % 2 === 0) {
+                rowIndex++;
+            }
+            colIndex = 0;
+        }
+
+        function resetColors() {
+            document.querySelectorAll('.street').forEach(function(square) {
+                square.style.backgroundColor = 'lightgray';
+            });
+        }
+
+        let colorSquares;
+        let squaresToColor;
+
+        document.getElementById('single-run-checkbox').addEventListener('change', function() {
+            // Reset colors and stop the current colorSquares loop whenever the checkbox is toggled
+            resetColors();
+            clearTimeout(colorSquares);
+            if (squaresToColor) {
+                // Immediately paint the squares if in single run mode
+                if (document.getElementById('single-run-checkbox').checked) {
+                    squaresToColor.forEach(function(squareNumber) {
+                        let color = squareNumber === squaresToColor[0] || squareNumber === squaresToColor[squaresToColor.length - 1] ? 'green' : 'red';
+                        let square = document.querySelector(`[data-number="${squareNumber}"]`);
+                        if (square) {
+                            square.style.backgroundColor = color;
+                        }
+                    });
+                } else {
+                    // Start the coloring from the second square
+                    paintSquares(1);
+                }
+            }
+        });
+
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            let file = e.target.files[0];
+            if (!file) return;
+
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let contents = e.target.result;
+                squaresToColor = JSON.parse(contents);
+
+                // Immediately paint the first and last squares
+                let firstSquareNumber = squaresToColor[0];
+                let firstSquare = document.querySelector(`[data-number="${firstSquareNumber}"]`);
+                if (firstSquare) {
+                    firstSquare.style.backgroundColor = 'green';
+                }
+
+                let lastSquareNumber = squaresToColor[squaresToColor.length - 1];
+                let lastSquare = document.querySelector(`[data-number="${lastSquareNumber}"]`);
+                if (lastSquare) {
+                    lastSquare.style.backgroundColor = 'green';
+                }
+
+                function paintSquares(index) {
+                    if (index >= squaresToColor.length - 1) {
+                        // We've reached the end of the array, reset all squares and start over
+                        resetColors();
+                        if (!document.getElementById('single-run-checkbox').checked) {
+                            setTimeout(function() { paintSquares(1); }, 1000);
+                        }
+                    } else {
+                        let squareNumber = squaresToColor[index];
+                        let color = 'red';
+                        let square = document.querySelector(`[data-number="${squareNumber}"]`);
+                        if (square) {
+                            square.style.backgroundColor = color;
+                        }
+                        colorSquares = setTimeout(function() {
+                            paintSquares(index + 1);
+                        }, 1000);
+                    }
+                }
+
+                // Start the coloring from the second square
+                if (!document.getElementById('single-run-checkbox').checked) {
+                    paintSquares(1);
+                }
+            };
+            reader.readAsText(file);
+        }, false);
+    </script>
+</div>
+
+</body>
+</html>

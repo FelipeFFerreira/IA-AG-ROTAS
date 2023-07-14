@@ -60,3 +60,21 @@
 	"rotas.h"
 	<gmp.h>
 
+1689267468 source:c:\github\ia-ag-rotas\ag_rotas\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	"rotas.h"
+
+1689303249 c:\github\ia-ag-rotas\ag_rotas\rotas.h
+	<stdbool.h>
+
+1689306611 source:c:\github\ia-ag-rotas\ag_rotas\rotas.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+	<math.h>
+	"rotas.h"
+
