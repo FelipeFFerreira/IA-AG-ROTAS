@@ -7,7 +7,7 @@
 
 faixas_roleta fx_roleta[TAMPOP];
 posicao inicio = {0, 0, 1};
-posicao final = {4, 5, 30};
+posicao final = {5, 5, 41};
 int i_geraativa = 0; //geracao atual
 posicao* m_i_pop[QTGERA][TAMPOP][TAMCROMO + 1] = {0, 0, 0}; //matriz de cromossomo
 unsigned long long int m_f_popaval[QTGERA][TAMPOP]; //matriz de avalia��es
@@ -18,6 +18,7 @@ posicao** i_pai2; //segundo pai selecionado
 unsigned long long int soma_pesos = 0;
 posicao matriz[LIN][COL];
 
+/* Função responsavel por inicializar o mapa com as respectivas cordenadas de cada posição */
 void init_mapa()
 {
     int i, j, cont = 0;
@@ -42,12 +43,16 @@ void print_mapa()
     }
 }
 
+/*Inicia população com 2 individuos
+ Um individuou contem todo o mapa completo
+ Os dois individuos sao criados iguais
+*/
 void criapop(void) {
     int i, j, k = 0, i_, j_;
-    for(i = 0; i < 1; i++) { //for gerecao
-        for(j = 0; j < TAMPOP; j++) { //for cromosso
-            for(i_ = 0; i_ < LIN; i_++) {
-                for(j_ = 0; j_ < COL; j_++) {
+    for (i = 0; i < 1; i++) { //for gerecao
+        for (j = 0; j < TAMPOP; j++) { //for cromosso
+            for (i_ = 0; i_ < LIN; i_++) {
+                for (j_ = 0; j_ < COL; j_++) {
                     m_i_pop[i][j][k++] = &matriz[i_][j_];
                 }
             }
@@ -81,10 +86,10 @@ void avaliapop(void) {
     int j, k;
     unsigned long long int peso = 0;
     soma_pesos = 0;
-    for(j = 0; j < TAMPOP; j++) {
-         for(k = 0;  k < TAMCROMO; k++) {
-            posicao * pos = m_i_pop[i_geraativa][j][k]; //cromo-init
-            if(k == 0) {
+    for (j = 0; j < TAMPOP; j++) {
+         for (k = 0;  k < TAMCROMO; k++) {
+            posicao* pos = m_i_pop[i_geraativa][j][k]; //cromo-init
+            if (k == 0) {
                 m_f_popaval[i_geraativa][j] = 0;
             }
             else {

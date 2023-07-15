@@ -45,7 +45,7 @@
         }
 
         .null-square {
-            background-color: blue;
+            background-color: rgba(255, 115, 0, 0.131);
         }
     </style>
 </head>
@@ -55,8 +55,8 @@
 <input type="checkbox" id="single-run-checkbox" /> <label for="single-run-checkbox">Modo de execução única</label>
 <div class="board">
     <script>
-        let ROWS = 5;
-        let COLS = 6;
+        let ROWS = 7;
+        let COLS = 7;
         let SQUARE_SIZE = 80; // size in pixels
         let BOARD_WIDTH = ROWS * 2 * SQUARE_SIZE; // size in pixels
         let BOARD_HEIGHT = COLS * 2 * SQUARE_SIZE; // size in pixels
@@ -120,27 +120,11 @@
         }
 
         let colorSquares;
-        let squaresToColor;
 
         document.getElementById('single-run-checkbox').addEventListener('change', function() {
             // Reset colors and stop the current colorSquares loop whenever the checkbox is toggled
             resetColors();
             clearTimeout(colorSquares);
-            if (squaresToColor) {
-                // Immediately paint the squares if in single run mode
-                if (document.getElementById('single-run-checkbox').checked) {
-                    squaresToColor.forEach(function(squareNumber) {
-                        let color = squareNumber === squaresToColor[0] || squareNumber === squaresToColor[squaresToColor.length - 1] ? 'green' : 'red';
-                        let square = document.querySelector(`[data-number="${squareNumber}"]`);
-                        if (square) {
-                            square.style.backgroundColor = color;
-                        }
-                    });
-                } else {
-                    // Start the coloring from the second square
-                    paintSquares(1);
-                }
-            }
         });
 
         document.getElementById('file-input').addEventListener('change', function(e) {
@@ -150,7 +134,7 @@
             let reader = new FileReader();
             reader.onload = function(e) {
                 let contents = e.target.result;
-                squaresToColor = JSON.parse(contents);
+                let squaresToColor = JSON.parse(contents);
 
                 // Immediately paint the first and last squares
                 let firstSquareNumber = squaresToColor[0];
@@ -158,7 +142,6 @@
                 if (firstSquare) {
                     firstSquare.style.backgroundColor = 'green';
                 }
-
                 let lastSquareNumber = squaresToColor[squaresToColor.length - 1];
                 let lastSquare = document.querySelector(`[data-number="${lastSquareNumber}"]`);
                 if (lastSquare) {
@@ -166,27 +149,44 @@
                 }
 
                 function paintSquares(index) {
+                    let singleRunMode = document.getElementById('single-run-checkbox').checked;
                     if (index >= squaresToColor.length - 1) {
-                        // We've reached the end of the array, reset all squares and start over
-                        resetColors();
-                        if (!document.getElementById('single-run-checkbox').checked) {
-                            setTimeout(function() { paintSquares(1); }, 1000);
+                        if (!singleRunMode) {
+                            // If we're not in single run mode, reset all squares except first and last and start over
+                            resetColors();
+                            // Repaint the first and last squares
+                            if (firstSquare) {
+                                firstSquare.style.backgroundColor = 'green';
+                            }
+                            if (lastSquare) {
+                                lastSquare.style.backgroundColor = 'green';
+                            }
+                            // Start the coloring from the second square
+                            colorSquares = setTimeout(function() { paintSquares(1); }, 250);
                         }
                     } else {
                         let squareNumber = squaresToColor[index];
-                        let color = 'red';
                         let square = document.querySelector(`[data-number="${squareNumber}"]`);
                         if (square) {
-                            square.style.backgroundColor = color;
+                            square.style.backgroundColor = 'red';
                         }
                         colorSquares = setTimeout(function() {
                             paintSquares(index + 1);
-                        }, 1000);
-                    }
+                        }, singleRunMode ? 250 : 1000);
+                    } 
                 }
 
-                // Start the coloring from the second square
-                if (!document.getElementById('single-run-checkbox').checked) {
+                let singleRunMode = document.getElementById('single-run-checkbox').checked;
+                if (singleRunMode) {
+                    for (let i = 1; i < squaresToColor.length - 1; i++) {
+                        let squareNumber = squaresToColor[i];
+                        let square = document.querySelector(`[data-number="${squareNumber}"]`);
+                        if (square) {
+                            square.style.backgroundColor = 'red';
+                        }
+                    }
+                } else {
+                    // Start the coloring from the second square
                     paintSquares(1);
                 }
             };

@@ -5,15 +5,15 @@
 
 #define TRUE 1
 #define FALSE 0
-#define QTGERA 20000
+#define QTGERA 40000
 #define TAMPOP 60
-#define TAMCROMO 30
-#define TAXASEL 1
+#define TAMCROMO 49
+#define TAXASEL 0.9
 #define TAXACRUZ 1
-#define TAXAMUTA 0.80
+#define TAXAMUTA 1
 
-#define LIN 5
-#define COL 6
+#define LIN 7
+#define COL 7
 //#define INSTALL_DEBUG
 
 typedef struct {
