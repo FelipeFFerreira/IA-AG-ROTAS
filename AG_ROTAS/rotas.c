@@ -11,7 +11,7 @@ posicao final = {5, 5, 41};
 int i_geraativa = 0; //geracao atual
 posicao* m_i_pop[QTGERA][TAMPOP][TAMCROMO + 1] = {0, 0, 0}; //matriz de cromossomo
 unsigned long long int m_f_popaval[QTGERA][TAMPOP]; //matriz de avalia��es
-posicao** indice_notas[TAMCROMO];
+posicao** indice_notas[TAMPOP];
 float m_f_estataval[QTGERA][3]; //matriz de estatisticas: fitness m�nimo, m�ximo, m�dio
 posicao** i_pai1; //primeiro pai selecionado
 posicao** i_pai2; //segundo pai selecionado
@@ -58,7 +58,7 @@ void criapop(void) {
             }
             k = 0;
         }
-        embaralha_alelos(i);
+        // embaralha_alelos(i);
     }
 }
 
@@ -80,6 +80,25 @@ unsigned long long int dis(posicao * inicio, posicao * atual)
     unsigned int lin = sqrt(pow((inicio->linha - atual->linha), 2));
     unsigned int col = sqrt(pow((inicio->col - atual->col), 2));
     return pow((lin + col) * 20, 2);
+}
+
+void print_avaliacao_parcial_populacao()
+{
+    printf("\n[%s]\n", __func__);
+    for (int i = 0; i < TAMPOP; i++) {
+        printf("[Individuo %d. = %llu\n", i, m_f_popaval[i_geraativa][i]);
+    }
+    printf("Soma dos pesos = %llu\n\n", soma_pesos);
+}
+
+void print_roleta()
+{
+    printf("\n[%s]\n", __func__);
+    int k, j;
+    for(k = 0; k < TAMPOP; k++) {
+        pos_cromo(fx_roleta[k].p, 0, &j);
+        printf("[.%d - porc = %.2f ; inf = %.2f ; sup = %.2f ; p = %d\n", k + 1, fx_roleta[k].porc, fx_roleta[k].inf, fx_roleta[k].sup, j);
+    }
 }
 
 void avaliapop(void) {
@@ -105,8 +124,11 @@ void avaliapop(void) {
         indice_notas[j] = &(m_i_pop[i_geraativa][j][0]); //guarda o endereco do cromosso
         soma_pesos += m_f_popaval[i_geraativa][j]; //conteudo da nota
     }
+    // print_avaliacao_parcial_populacao();
     ordenar_cromo(m_f_popaval);
+    // print_avaliacao_parcial_populacao();
     roleta(soma_pesos);
+    print_roleta();
 }
 
 unsigned long long int reavalia(int _final, int j)
