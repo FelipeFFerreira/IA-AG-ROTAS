@@ -31,16 +31,19 @@ srand((unsigned long long)time(NULL) );
 
 	while(TRUE) {
 		avaliapop();
-		system("pause");
+
 		reproduzpop();
+		// system("pause");
 		//mostrapop();
+
 		if(checaparada()){
             avaliapop();
             break;
-		};
+		}
 	}
 	mostrapop();
-    //bests_cromo();
+    bests_cromo();
     print_arq_rota();
+    // system("pause");
 	return 0;
 }

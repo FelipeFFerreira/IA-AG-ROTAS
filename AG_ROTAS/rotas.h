@@ -5,8 +5,8 @@
 
 #define TRUE 1
 #define FALSE 0
-#define QTGERA 40000
-#define TAMPOP 60
+#define QTGERA 50000
+#define TAMPOP 80
 #define TAMCROMO 49
 #define TAXASEL 0.9
 #define TAXACRUZ 1
@@ -40,7 +40,7 @@ unsigned long long int dis(posicao * inicio, posicao * atual);
 posicao** selecionapais();
 void reproduzpop(void);
 void elitismo();
-bool cruzapais(posicao** pai_1, posicao** pai_2, int* j1, int* j2);
+bool cruzapais(posicao** pai_1, posicao** pai_2);
 void mutapais(int j);
 void verifica_repeticoes(int j_pai, int j_filho, int pt_corte_1, int pt_corte_2);
 int checaparada(void);
