@@ -7,13 +7,12 @@
 
 faixas_roleta fx_roleta[TAMPOP];
 posicao inicio = {0, 0, 1};
-posicao final = {5, 5, 41};
+posicao final = {8, 4, 77};
 int i_geraativa = 0; //geracao atual
 posicao* m_i_pop_anterior[1][TAMPOP][TAMCROMO] = {0, 0, 0}; //matriz de cromossomo
 posicao* m_i_pop_nova[1][TAMPOP][TAMCROMO] = {0, 0, 0}; //matriz de cromossomo
 unsigned long long int m_f_popaval[1][TAMPOP]; //matriz de avalia��es
 posicao** indice_notas[TAMPOP];
-float m_f_estataval[QTGERA][3]; //matriz de estatisticas: fitness m�nimo, m�ximo, m�dio
 posicao** i_pai1; //primeiro pai selecionado
 posicao** i_pai2; //segundo pai selecionado
 unsigned long long int soma_pesos = 0;
@@ -59,7 +58,7 @@ void criapop(void) {
             }
             k = 0;
         }
-        // embaralha_alelos(i);
+        embaralha_alelos(i);
     }
 }
 
@@ -244,7 +243,7 @@ void reproduzpop(void) {
     i_geraativa += 1;
     posicao** i_pai1_;
     posicao** i_pai2_;
-    // elitismo();
+    elitismo();
 
 	while(_i_novapop < TAMPOP) {
         do {

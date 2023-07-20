@@ -3,17 +3,19 @@
 #include <stdbool.h>
 //#include <gmp.h>
 
+#define LIN 9
+#define COL 9
+
 #define TRUE 1
 #define FALSE 0
-#define QTGERA 50000
+#define QTGERA 30000
 #define TAMPOP 80
-#define TAMCROMO 49
+#define TAMCROMO 81 //BUG
 #define TAXASEL 0.9
 #define TAXACRUZ 1
 #define TAXAMUTA 1
 
-#define LIN 7
-#define COL 7
+
 //#define INSTALL_DEBUG
 
 typedef struct {
