@@ -6,12 +6,12 @@
 
 #define LIN 7
 #define COL 7
-#define QTD_GERACAO 40000
-#define TAM_POPULACAO 60
+#define QTD_GERACAO 20000
+#define TAM_POPULACAO 90
 #define TAM_CROMOSSOMO 49
 #define TAXA_SEL 0.9
-#define TAXA_CRUZAMENTO 1
-#define TAXA_MUTACAO 1
+#define TAXA_CRUZAMENTO 0.8
+#define TAXA_MUTACAO 0.8
 
 typedef struct {
     int linha;
@@ -26,10 +26,10 @@ typedef struct {
     unsigned int p;
 } Faixas_roleta;
 
-Coordenada populacao_anterior[1][TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
-Coordenada populacao_nova[1][TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
+Coordenada populacao_anterior[TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
+Coordenada populacao_nova[TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
 
-unsigned long long int avaliacao_parcial_populacao[1][TAM_POPULACAO];  // Matriz de avalia��es parcial
+unsigned long long int avaliacao_parcial_populacao[TAM_POPULACAO];  // Matriz de avalia��es parcial
 unsigned int indice_notas[TAM_POPULACAO];
 Faixas_roleta fx_roleta[TAM_POPULACAO];
 
@@ -44,7 +44,7 @@ void avaliar_populacao();
 unsigned long long int reavalia(int , int);
 unsigned long long int distancia(Coordenada, Coordenada);
 void print_avaliacao_parcial_populacao();
-void ordenar_cromo(unsigned long long int v[][TAM_POPULACAO]);
+void ordenar_cromo(unsigned long long int v[TAM_POPULACAO]);
 void reproduzir_nova_geracao();
 unsigned int get_pais();
 void roleta();
@@ -85,20 +85,20 @@ int main()
     return 0;
 }
 
-void print_cromo(int j, int i)
+void print_cromo(int j)
 {
     printf("\n[%s [%d] G = %d\n", __func__, j, geracao_atual);
     int k;
     for(k = 0; k < TAM_CROMOSSOMO; k++)
-        printf("C.%d.%d dado= %d\n", j, k + 1, populacao_anterior[i][j][k].dado);
+        printf("C.%d.%d dado= %d\n", j, k + 1, populacao_anterior[j][k].dado);
 }
 
-void print_cromo_nova(int j, int i)
+void print_cromo_nova(int j)
 {
     printf("\n[%s [%d] G = %d\n", __func__, j, geracao_atual);
     int k;
     for(k = 0; k < TAM_CROMOSSOMO; k++)
-        printf("C.%d.%d dado= %d [%d][%d]\n", j, k + 1, populacao_nova[i][j][k].dado,  populacao_nova[i][j][k].linha, populacao_nova[i][j][k].col );
+        printf("C.%d.%d dado= %d [%d][%d]\n", j, k + 1, populacao_nova[j][k].dado,  populacao_nova[j][k].linha, populacao_nova[j][k].col );
 }
 
 void bests_cromo()
@@ -106,7 +106,7 @@ void bests_cromo()
     int j;
     j = indice_notas[TAM_POPULACAO - 1];
     printf("\ni = %d, j = %d\n", geracao_atual, j);
-    print_cromo(j, 0);
+    print_cromo(j);
 }
 
 void print_arq_rota()
@@ -119,12 +119,12 @@ void print_arq_rota()
 
     // pos_cromo(indice_notas[TAM_POPULACAO - 1], i_geraativa, &j);
     j = indice_notas[TAM_POPULACAO - 1];
-    for (k = 0; populacao_anterior[0][j][k].dado != final.dado; k++) {
-        if (populacao_anterior[0][j][k].dado == inicio.dado)
-            fprintf(ptr_arq , "%d,", populacao_anterior[0][j][k].dado);
-        else fprintf(ptr_arq , "%d,", populacao_anterior[0][j][k].dado);
+    for (k = 0; populacao_anterior[j][k].dado != final.dado; k++) {
+        if (populacao_anterior[j][k].dado == inicio.dado)
+            fprintf(ptr_arq , "%d,", populacao_anterior[j][k].dado);
+        else fprintf(ptr_arq , "%d,", populacao_anterior[j][k].dado);
     }
-    fprintf(ptr_arq , "%d", populacao_anterior[0][j][k].dado);
+    fprintf(ptr_arq , "%d", populacao_anterior[j][k].dado);
     fprintf(ptr_arq , "%s", "]\n");
     fclose(ptr_arq);
 }
@@ -137,7 +137,7 @@ int check_stop() {
 unsigned long long int reavalia(int _final, int j)
 {
     unsigned long long int peso = 0;
-    return peso = (populacao_anterior[0][j][0].dado != inicio.dado) ? (avaliacao_parcial_populacao[0][j]) * 100 : peso;
+    return peso = (populacao_anterior[j][0].dado != inicio.dado) ? (avaliacao_parcial_populacao[j]) * 100 : peso;
 }
 
 unsigned long long int distancia(Coordenada inicio, Coordenada atual)
@@ -151,7 +151,7 @@ void print_avaliacao_parcial_populacao()
 {
     printf("\n[%s]\n", __func__);
     for (int i = 0; i < TAM_POPULACAO; i++) {
-        printf("[Individuo %d. = %llu\n", i, avaliacao_parcial_populacao[0][i]);
+        printf("[Individuo %d. = %llu\n", i, avaliacao_parcial_populacao[i]);
     }
     printf("Soma dos pesos = %llu\n\n", soma_pesos);
 }
@@ -161,7 +161,7 @@ void printf_indice_notas()
     printf("\n[%s]\n", __func__);
     for (int i = 0; i < TAM_POPULACAO; i++)
     {
-       print_cromo(indice_notas[i], 0);
+       print_cromo(indice_notas[i]);
     }
 }
 
@@ -186,8 +186,8 @@ void verifica_repeticoes(unsigned int j_pai, int j_filho, int pt_corte_1, int pt
         cked_2 = true;
         for (k = TAM_CROMOSSOMO - 1; k >= pt_corte_2; k--) {
             for (k1 = pt_corte_1; k1 < pt_corte_2; k1++) {
-                if (populacao_nova[0][j_filho][k].dado == populacao_nova[0][j_filho][k1].dado){//, comparar end ou dado?
-                     populacao_nova[0][j_filho][k] = populacao_anterior[0][j_pai][k1];
+                if (populacao_nova[j_filho][k].dado == populacao_nova[j_filho][k1].dado){//, comparar end ou dado?
+                     populacao_nova[j_filho][k] = populacao_anterior[j_pai][k1];
                     cked_1 = false;
                     break;
                 }
@@ -195,8 +195,8 @@ void verifica_repeticoes(unsigned int j_pai, int j_filho, int pt_corte_1, int pt
         }
         for (k = 0; k < pt_corte_1; k++){
             for (k1 = pt_corte_1; k1 < pt_corte_2; k1++){
-                if (populacao_nova[0][j_filho][k].dado == populacao_nova[0][j_filho][k1].dado){//, comparar end ou dado?
-                     populacao_nova[0][j_filho][k] = populacao_anterior[0][j_pai][k1];
+                if (populacao_nova[j_filho][k].dado == populacao_nova[j_filho][k1].dado){//, comparar end ou dado?
+                     populacao_nova[j_filho][k] = populacao_anterior[j_pai][k1];
                     cked_2 = false;
                     break;
                 }
@@ -209,21 +209,19 @@ void transfer_pop()
 {
     for (int j = 0; j < TAM_POPULACAO; j++) {
         for (int k = 0; k < TAM_CROMOSSOMO; k++) {
-            populacao_anterior[0][j][k] = populacao_nova[0][j][k];
+            populacao_anterior[j][k] = populacao_nova[j][k];
 
         }
     }
 }
 
-
-
 void mutapais(int j) {
     if(((double)rand() / RAND_MAX) <= TAXA_MUTACAO) {
 	    int pt_mt_1 = rand() % TAM_CROMOSSOMO;
 	    int pt_mt_2 = rand() % TAM_CROMOSSOMO;
-	    Coordenada aux = populacao_nova[0][j][pt_mt_1];
-        populacao_nova[0][j][pt_mt_1] = populacao_nova[0][j][pt_mt_2];
-        populacao_nova[0][j][pt_mt_2] = aux;
+	    Coordenada aux = populacao_nova[j][pt_mt_1];
+        populacao_nova[j][pt_mt_1] = populacao_nova[j][pt_mt_2];
+        populacao_nova[j][pt_mt_2] = aux;
 	}
 }
 
@@ -263,12 +261,12 @@ bool cruzapais(unsigned int pai_1, unsigned int pai_2) {
         pt_corte_2 = pt_corte_1 + rand() % (TAM_CROMOSSOMO  - pt_corte_1);
         for (k = 0; k < TAM_CROMOSSOMO; k++) {
             if (k >= pt_corte_1 && k < pt_corte_2) {
-                populacao_nova[0][id_cruz + 1][k] = populacao_anterior[0][j_pai][k]; //filho mae
-                populacao_nova[0][id_cruz][k] = populacao_anterior[0][l_mae][k]; //filho pai
+                populacao_nova[id_cruz + 1][k] = populacao_anterior[j_pai][k]; //filho mae
+                populacao_nova[id_cruz][k] = populacao_anterior[l_mae][k]; //filho pai
             }
             else {
-                populacao_nova[0][id_cruz][k] = populacao_anterior[0][j_pai][k];
-                populacao_nova[0][id_cruz + 1][k] = populacao_anterior[0][l_mae][k];
+                populacao_nova[id_cruz][k] = populacao_anterior[j_pai][k];
+                populacao_nova[id_cruz + 1][k] = populacao_anterior[l_mae][k];
             }
         }
         verifica_repeticoes(j_pai, id_cruz, pt_corte_1, pt_corte_2);
@@ -287,22 +285,22 @@ void avaliar_populacao() {
     soma_pesos = 0;
     for (j = 0; j < TAM_POPULACAO; j++) {
          for (k = 0;  k < TAM_CROMOSSOMO; k++) {
-            Coordenada pos = populacao_anterior[0][j][k]; //cromo-init
+            Coordenada pos = populacao_anterior[j][k]; //cromo-init
             if (k == 0) {
-                avaliacao_parcial_populacao[0][j] = 0;
+                avaliacao_parcial_populacao[j] = 0;
             }
             else {
-                peso = pow(distancia(populacao_anterior[0][j][k - 1], populacao_anterior[0][j][k]), 1);
-                avaliacao_parcial_populacao[0][j] += peso;
+                peso = pow(distancia(populacao_anterior[j][k - 1], populacao_anterior[j][k]), 1);
+                avaliacao_parcial_populacao[j] += peso;
             }
             if (k != 0 && pos.dado == final.dado) {
-                avaliacao_parcial_populacao[0][j] += k;
-                avaliacao_parcial_populacao[0][j] += reavalia(k, j);
+                avaliacao_parcial_populacao[j] += k;
+                avaliacao_parcial_populacao[j] += reavalia(k, j);
                 break;
             }
         }
         indice_notas[j] = j; //guarda o endereco do cromosso
-        soma_pesos += avaliacao_parcial_populacao[0][j]; //conteudo da nota
+        soma_pesos += avaliacao_parcial_populacao[j]; //conteudo da nota
     }
 
     // printf_indice_notas();
@@ -312,6 +310,7 @@ void avaliar_populacao() {
     // printf_indice_notas();
     roleta(soma_pesos);
     // print_roleta();
+    //printf("soma = %llu\n", soma_pesos);
 }
 
 void print_roleta()
@@ -327,24 +326,24 @@ void roleta()
 {
     int k;
     for(k = 0; k < TAM_POPULACAO; k++) {
-        fx_roleta[k].porc = (double)avaliacao_parcial_populacao[0][k] / soma_pesos;
+        fx_roleta[k].porc = (double)avaliacao_parcial_populacao[k] / soma_pesos;
         fx_roleta[k].inf = k == 0 ? 0 : fx_roleta[k - 1].sup ;
         fx_roleta[k].sup = fx_roleta[k].inf + (fx_roleta[k].porc);
         fx_roleta[k].p = indice_notas[(TAM_POPULACAO - 1) - k];
     }
 }
 
-void ordenar_cromo(unsigned long long int v[][TAM_POPULACAO])
+void ordenar_cromo(unsigned long long int v[TAM_POPULACAO])
 {
     int i, j, x, p;
 	for (j = 1; j < TAM_POPULACAO; ++j) {
-		x = v[0][j];
+		x = v[j];
 		p = indice_notas[j];
-		for (i = j - 1; i >= 0 && v[0][i] < x; --i) {
-            v[0][i + 1] = v[0][i];
+		for (i = j - 1; i >= 0 && v[i] < x; --i) {
+            v[i + 1] = v[i];
             indice_notas[i + 1] = indice_notas[i];
 		}
-		v[0][i + 1] = x;
+		v[i + 1] = x;
 		indice_notas[i + 1] = p;
 	}
 }
@@ -389,19 +388,30 @@ void init_mapa()
 }
 
 void init_populacao() {
-    int k = 0;
-    for (int p = 0; p < TAM_POPULACAO; p++) {
-        for (int i = 0; i < LIN; i++) {
-            for (int j = 0; j < COL; j ++) {
-                populacao_anterior[0][p][k].col = mapa[i][j].col;
-                populacao_anterior[0][p][k].linha = mapa[i][j].linha;
-                populacao_anterior[0][p][k++].dado = mapa[i][j].dado;
+    int p, i, j, k;
+    for (p = 0; p < TAM_POPULACAO; p++) {
+        k = 0;
+        for (i = 0; i < LIN; i++) {
+            for (j = 0; j < COL; j ++) {
+                populacao_anterior[p][k].col = mapa[i][j].col;
+                populacao_anterior[p][k].linha = mapa[i][j].linha;
+                populacao_anterior[p][k++].dado = mapa[i][j].dado;
             }
         }
-        k = 0;
+
+        // Embaralhamento de Fisher-Yates
+        for (i = TAM_CROMOSSOMO - 1; i > 0; i--) {
+            int j = rand() % (i + 1);
+
+            // troca populacao_anterior[p][i] e populacao_anterior[p][j]
+            Coordenada temp = populacao_anterior[p][i];
+            populacao_anterior[p][i] = populacao_anterior[p][j];
+            populacao_anterior[p][j] = temp;
+        }
     }
     free_mapa();
 }
+
 
 void print_populacao() {
     printf("\n\n**PRINT POPULACAO***\n\n");
@@ -409,8 +419,8 @@ void print_populacao() {
     for(j = 0; j < TAM_POPULACAO; j++) {
         for(k = 0; k < TAM_CROMOSSOMO; k++) {
             printf("G.%d, %d.%d dado= %d, [%d][%d]\n",
-                    geracao_atual + 1, j + 1, k + 1, populacao_anterior[0][j][k].dado,
-                     populacao_anterior[0][j][k].linha, populacao_anterior[0][j][k].col);
+                    geracao_atual + 1, j + 1, k + 1, populacao_anterior[j][k].dado,
+                     populacao_anterior[j][k].linha, populacao_anterior[j][k].col);
         }
         printf("\n");
     }
