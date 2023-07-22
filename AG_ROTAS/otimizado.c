@@ -65,8 +65,6 @@ unsigned long long int soma_pesos = 0;
 int main()
 {
     srand((unsigned long long)time(NULL) );
-    init_mapa();
-    print_mapa();
     init_populacao();
     print_populacao();
 
@@ -360,56 +358,18 @@ void print_mapa()
     }
 }
 
-void free_mapa()
-{
-    int i;
-
-    for(i = 0; i < LIN; i++) {
-        free(mapa[i]);
-    }
-
-    free(mapa);
-}
-
-void init_mapa()
-{
-    int i, j, cont = 0;
-
-    mapa = malloc(LIN * sizeof(Coordenada*));
-
-    for (i = 0; i < LIN; i++) {
-        mapa[i] = malloc(COL * sizeof(Coordenada));
-        for (j = 0; j < COL; j++) {
-            mapa[i][j].dado = ++cont;
-            mapa[i][j].linha = i;
-            mapa[i][j].col = j;
-        }
-    }
-}
-
 void init_populacao() {
-    int p, i, j, k;
+    int p, i, j, k, cont = 0;
     for (p = 0; p < TAM_POPULACAO; p++) {
-        k = 0;
+        k = 0; cont = 0;
         for (i = 0; i < LIN; i++) {
             for (j = 0; j < COL; j ++) {
-                populacao_anterior[p][k].col = mapa[i][j].col;
-                populacao_anterior[p][k].linha = mapa[i][j].linha;
-                populacao_anterior[p][k++].dado = mapa[i][j].dado;
+                populacao_anterior[p][k].col = j;
+                populacao_anterior[p][k].linha = i;
+                populacao_anterior[p][k++].dado = cont++;
             }
         }
-
-        // Embaralhamento de Fisher-Yates
-        for (i = TAM_CROMOSSOMO - 1; i > 0; i--) {
-            int j = rand() % (i + 1);
-
-            // troca populacao_anterior[p][i] e populacao_anterior[p][j]
-            Coordenada temp = populacao_anterior[p][i];
-            populacao_anterior[p][i] = populacao_anterior[p][j];
-            populacao_anterior[p][j] = temp;
-        }
     }
-    free_mapa();
 }
 
 
