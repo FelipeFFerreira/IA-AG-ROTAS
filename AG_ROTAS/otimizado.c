@@ -14,16 +14,16 @@
 #define TAXA_MUTACAO 0.8
 
 typedef struct {
-    int linha;
-    int col;
-    int dado;
+    char linha;
+    char col;
+    char dado;
 } Coordenada;
 
 typedef struct {
-    double inf;
-    double sup;
-    double porc;
-    unsigned int p;
+    float inf;
+    float sup;
+    float porc;
+    char p;
 } Faixas_roleta;
 
 Coordenada populacao_anterior[TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
@@ -60,7 +60,7 @@ Coordenada final = {5, 3, 39};
 Coordenada** mapa;
 int geracao_atual = 0;
 unsigned long long int soma_pesos = 0;
-
+unsigned long long int maior_valor_soma_pesos = 0;
 
 int main()
 {
@@ -80,6 +80,7 @@ int main()
     print_populacao();
     bests_cromo();
     print_arq_rota();
+    printf("\nMaior valor de soma pesos = %llu\n", maior_valor_soma_pesos);
     return 0;
 }
 
@@ -166,13 +167,27 @@ void printf_indice_notas()
 unsigned int get_pais()
 {
     double n = rand() / (double)RAND_MAX;
-    // printf("\n[%s] n = %.3f\n", __func__, n);
     for (int i = 0; i < TAM_POPULACAO; i++) {
-        if (n > fx_roleta[i].inf && n <= fx_roleta[i].sup) {
+        if (n >= fx_roleta[i].inf && (n < fx_roleta[i].sup || i == TAM_POPULACAO - 1)) {
             return fx_roleta[i].p;
         }
     }
-    return NULL;
+    // Essa linha nunca deve ser alcançada, mas pode ser útil para debug
+    printf("Erro: n = %.3f não está em nenhuma faixa\n", n);
+    exit(10);
+}
+
+void roleta()
+{
+    int k;
+    double acumulado = 0.0;
+    for(k = 0; k < TAM_POPULACAO; k++) {
+        fx_roleta[k].porc = (float)avaliacao_parcial_populacao[k] / soma_pesos;
+        fx_roleta[k].inf = acumulado;
+        acumulado += fx_roleta[k].porc;
+        fx_roleta[k].sup = acumulado;
+        fx_roleta[k].p = indice_notas[(TAM_POPULACAO - 1) - k];
+    }
 }
 
 void verifica_repeticoes(unsigned int j_pai, int j_filho, int pt_corte_1, int pt_corte_2)
@@ -232,11 +247,11 @@ void reproduzir_nova_geracao() {
 
 	while(_i_novapop < TAM_POPULACAO) {
         do {
-            while(!((i_pai1_ = get_pais()) != NULL));
-            while(!((i_pai2_ = get_pais()) != NULL));
+            i_pai1_ = get_pais();
+            i_pai2_ = get_pais();
             do {
                 if (i_pai2_ == i_pai1_)
-                    while(!((i_pai2_ = get_pais()) != NULL));
+                    i_pai2_ = get_pais();
                 else
                     break;
             } while(!(i_pai2_ != i_pai1_));
@@ -307,8 +322,9 @@ void avaliar_populacao() {
     // print_avaliacao_parcial_populacao();
     // printf_indice_notas();
     roleta(soma_pesos);
-    // print_roleta();
+    //print_roleta();
     //printf("soma = %llu\n", soma_pesos);
+    if (soma_pesos >= maior_valor_soma_pesos) maior_valor_soma_pesos = soma_pesos;
 }
 
 void print_roleta()
@@ -317,17 +333,6 @@ void print_roleta()
     int k;
     for(k = 0; k < TAM_POPULACAO; k++) {
         printf("[.%d - porc = %.2f ; inf = %.2f ; sup = %.2f ; p = %d\n", k + 1, fx_roleta[k].porc, fx_roleta[k].inf, fx_roleta[k].sup, fx_roleta[k].p);
-    }
-}
-
-void roleta()
-{
-    int k;
-    for(k = 0; k < TAM_POPULACAO; k++) {
-        fx_roleta[k].porc = (double)avaliacao_parcial_populacao[k] / soma_pesos;
-        fx_roleta[k].inf = k == 0 ? 0 : fx_roleta[k - 1].sup ;
-        fx_roleta[k].sup = fx_roleta[k].inf + (fx_roleta[k].porc);
-        fx_roleta[k].p = indice_notas[(TAM_POPULACAO - 1) - k];
     }
 }
 
