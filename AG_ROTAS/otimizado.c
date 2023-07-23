@@ -140,8 +140,8 @@ unsigned long long int reavalia(int _final, int j)
 
 unsigned long long int distancia(Coordenada inicio, Coordenada atual)
 {
-    unsigned int lin = sqrt(pow((inicio.linha - atual.linha), 2));
-    unsigned int col = sqrt(pow((inicio.col - atual.col), 2));
+    unsigned int lin = abs(inicio.linha - atual.linha);
+    unsigned int col = abs(inicio.col - atual.col);
     return pow((lin + col) * 20, 2);
 }
 
@@ -279,9 +279,9 @@ bool cruzapais(unsigned int pai_1, unsigned int pai_2) {
 
 void avaliar_populacao() {
     int j, k;
-    unsigned long long int peso = 0;
     soma_pesos = 0;
     for (j = 0; j < TAM_POPULACAO; j++) {
+        unsigned long long int peso = 0;
          for (k = 0;  k < TAM_CROMOSSOMO; k++) {
             Coordenada pos = populacao_anterior[j][k]; //cromo-init
             if (k == 0) {
