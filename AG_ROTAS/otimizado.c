@@ -52,13 +52,14 @@ unsigned int distancia(Coordenada, Coordenada);
 void print_avaliacao_parcial_populacao();
 void ordenar_cromo(unsigned int v[TAM_POPULACAO]);
 void reproduzir_nova_geracao();
-unsigned int get_pais();
+void get_pais(char* , char*);
 void roleta();
 void print_roleta();
 int check_stop();
 void print_arq_rota();
 void bests_cromo();
 bool cruzapais(unsigned int pai_1, unsigned int pai_2);
+
 
 
 
@@ -111,15 +112,7 @@ unsigned int distancia(Coordenada inicio, Coordenada atual)
     return pow((lin + col) * 20, 2);
 }
 
-
-unsigned int get_pais()
-{
-    fixed_point_t n = float_to_fixed_point((float)rand() / RAND_MAX);
-    for (int i = 0; i < TAM_POPULACAO; i++) {
-        if (n >= fx_roleta[i].inf && (n < fx_roleta[i].sup || i == TAM_POPULACAO - 1)) {
-            return fx_roleta[i].p;
-        }
-    }
+void debug(fixed_point_t n) {
     // Essa linha nunca deve ser alcançada.
     printf("Erro: n = %.3f não está em nenhuma faixa\n", n);
     exit(10);
@@ -186,29 +179,51 @@ void mutapais(int j) {
 	}
 }
 
+void get_pais(char* pai_1, char* pai_2)
+{
+    char j;
+    fixed_point_t n;
+    bool debug_t = false;
+    while (*pai_1 == *pai_2) {
+
+        n = float_to_fixed_point((float)rand() / RAND_MAX);
+        for (j = 0; j < TAM_POPULACAO; j++) {
+            if (n >= fx_roleta[j].inf && (n < fx_roleta[j].sup || j == TAM_POPULACAO - 1)) {
+                *pai_1 = fx_roleta[j].p;
+                debug_t = true;
+            }
+        }
+        if (!debug_t) debug(n);
+        debug_t = false;
+        n = float_to_fixed_point((float)rand() / RAND_MAX);
+        for (j = 0; j < TAM_POPULACAO; j++) {
+            if (n >= fx_roleta[j].inf && (n < fx_roleta[j].sup || j == TAM_POPULACAO - 1)) {
+                *pai_2 = fx_roleta[j].p;
+                debug_t = true;
+            }
+        }
+        if (!debug_t) debug(n);
+        debug_t = false;
+    }
+}
+
 void reproduzir_nova_geracao() {
 
-	int _i_novapop = 0;
+	char _i_novapop = 0;
     geracao_atual += 1;
-    unsigned int i_pai1_, i_pai2_;
+    char pai_1, pai_2;
     // elitismo();
 
 	while(_i_novapop < TAM_POPULACAO) {
         do {
-            i_pai1_ = get_pais();
-            i_pai2_ = get_pais();
-            do {
-                if (i_pai2_ == i_pai1_)
-                    i_pai2_ = get_pais();
-                else
-                    break;
-            } while(!(i_pai2_ != i_pai1_));
+            pai_1 = 0; pai_2 = 0;
+            get_pais(&pai_1, &pai_2);
 
-        } while(!cruzapais(i_pai1_, i_pai2_));
+        }while(!cruzapais(pai_1, pai_2));
 
 		mutapais(_i_novapop);
 		mutapais(_i_novapop + 1);
-		_i_novapop+=2;
+		_i_novapop += 2;
 	}
 	transfer_pop();
 }
