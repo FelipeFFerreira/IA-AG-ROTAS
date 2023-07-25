@@ -19,10 +19,13 @@ typedef struct {
     char dado;
 } Coordenada;
 
+typedef int fixed_point_t;
+#define FIXED_POINT_FRACTIONAL_BITS 20
+#define SCALE_FACTOR 1000000
 typedef struct {
-    float inf;
-    float sup;
-    float porc;
+    fixed_point_t inf;
+    fixed_point_t sup;
+    fixed_point_t porc;
     char p;
 } Faixas_roleta;
 
@@ -61,6 +64,14 @@ Coordenada** mapa;
 int geracao_atual = 0;
 unsigned long long int soma_pesos = 0;
 unsigned long long int maior_valor_soma_pesos = 0;
+
+fixed_point_t float_to_fixed_point(float x) {
+    return (fixed_point_t)(x * SCALE_FACTOR);
+}
+
+float fixed_point_to_float(fixed_point_t x) {
+    return ((float)x / SCALE_FACTOR);
+}
 
 int main()
 {
@@ -166,7 +177,7 @@ void printf_indice_notas()
 
 unsigned int get_pais()
 {
-    double n = rand() / (double)RAND_MAX;
+    fixed_point_t n = float_to_fixed_point((float)rand() / RAND_MAX);
     for (int i = 0; i < TAM_POPULACAO; i++) {
         if (n >= fx_roleta[i].inf && (n < fx_roleta[i].sup || i == TAM_POPULACAO - 1)) {
             return fx_roleta[i].p;
@@ -180,9 +191,9 @@ unsigned int get_pais()
 void roleta()
 {
     int k;
-    double acumulado = 0.0;
+    fixed_point_t acumulado = 0;
     for(k = 0; k < TAM_POPULACAO; k++) {
-        fx_roleta[k].porc = (float)avaliacao_parcial_populacao[k] / soma_pesos;
+        fx_roleta[k].porc = float_to_fixed_point((float)avaliacao_parcial_populacao[k] / soma_pesos);
         fx_roleta[k].inf = acumulado;
         acumulado += fx_roleta[k].porc;
         fx_roleta[k].sup = acumulado;
@@ -322,7 +333,7 @@ void avaliar_populacao() {
     // print_avaliacao_parcial_populacao();
     // printf_indice_notas();
     roleta(soma_pesos);
-    //print_roleta();
+    print_roleta();
     //printf("soma = %llu\n", soma_pesos);
     if (soma_pesos >= maior_valor_soma_pesos) maior_valor_soma_pesos = soma_pesos;
 }
@@ -332,7 +343,8 @@ void print_roleta()
     printf("\n[%s]\n", __func__);
     int k;
     for(k = 0; k < TAM_POPULACAO; k++) {
-        printf("[.%d - porc = %.2f ; inf = %.2f ; sup = %.2f ; p = %d\n", k + 1, fx_roleta[k].porc, fx_roleta[k].inf, fx_roleta[k].sup, fx_roleta[k].p);
+        printf("[.%d - porc = %f ; inf = %f ; sup = %f ; p = %d\n", k + 1, fixed_point_to_float(fx_roleta[k].porc),
+        fixed_point_to_float(fx_roleta[k].inf), fixed_point_to_float(fx_roleta[k].sup), fx_roleta[k].p);
     }
 }
 
