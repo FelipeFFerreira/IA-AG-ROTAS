@@ -20,7 +20,6 @@ typedef struct {
 } Coordenada;
 
 typedef int fixed_point_t;
-#define FIXED_POINT_FRACTIONAL_BITS 20
 #define SCALE_FACTOR 1000000
 typedef struct {
     fixed_point_t inf;
@@ -333,8 +332,8 @@ void avaliar_populacao() {
     // print_avaliacao_parcial_populacao();
     // printf_indice_notas();
     roleta(soma_pesos);
-    print_roleta();
-    //printf("soma = %llu\n", soma_pesos);
+    // print_roleta();
+    // printf("soma = %llu\n", soma_pesos);
     if (soma_pesos >= maior_valor_soma_pesos) maior_valor_soma_pesos = soma_pesos;
 }
 
