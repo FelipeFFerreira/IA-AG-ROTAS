@@ -6,8 +6,8 @@
 
 #define LIN 7
 #define COL 7
-#define QTD_GERACAO 20000
-#define TAM_POPULACAO 90
+#define QTD_GERACAO 40000
+#define TAM_POPULACAO 100
 #define TAM_CROMOSSOMO 49
 #define TAXA_SEL 0.9
 #define TAXA_CRUZAMENTO 0.8
@@ -32,8 +32,14 @@ Coordenada populacao_anterior[TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matr
 Coordenada populacao_nova[TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
 
 unsigned int avaliacao_parcial_populacao[TAM_POPULACAO];  // Matriz de avalia��es parcial
-unsigned int indice_notas[TAM_POPULACAO];
+unsigned char indice_notas[TAM_POPULACAO];
 Faixas_roleta fx_roleta[TAM_POPULACAO];
+
+Coordenada inicio = {0, 0, 1};
+Coordenada final = {5, 3, 39};
+int geracao_atual = 0;
+unsigned int soma_pesos = 0;
+unsigned int maior_valor_soma_pesos = 0;
 
 // Prototipos Funcoes
 void embaralha_alelos();
@@ -41,7 +47,7 @@ void init_populacao();
 void free_mapa();
 void print_populacao();
 void avaliar_populacao();
-unsigned int reavalia(int , int);
+unsigned int reavalia(char);
 unsigned int distancia(Coordenada, Coordenada);
 void print_avaliacao_parcial_populacao();
 void ordenar_cromo(unsigned int v[TAM_POPULACAO]);
@@ -55,11 +61,7 @@ void bests_cromo();
 bool cruzapais(unsigned int pai_1, unsigned int pai_2);
 
 
-Coordenada inicio = {0, 0, 1};
-Coordenada final = {5, 3, 39};
-int geracao_atual = 0;
-unsigned int soma_pesos = 0;
-unsigned int maior_valor_soma_pesos = 0;
+
 
 fixed_point_t float_to_fixed_point(float x) {
     return (fixed_point_t)(x * SCALE_FACTOR);
@@ -91,85 +93,24 @@ int main()
     return 0;
 }
 
-void print_cromo(int j)
-{
-    printf("\n[%s [%d] G = %d\n", __func__, j, geracao_atual);
-    int k;
-    for(k = 0; k < TAM_CROMOSSOMO; k++)
-        printf("C.%d.%d dado= %d\n", j, k + 1, populacao_anterior[j][k].dado);
-}
-
-void print_cromo_nova(int j)
-{
-    printf("\n[%s [%d] G = %d\n", __func__, j, geracao_atual);
-    int k;
-    for(k = 0; k < TAM_CROMOSSOMO; k++)
-        printf("C.%d.%d dado= %d [%d][%d]\n", j, k + 1, populacao_nova[j][k].dado,  populacao_nova[j][k].linha, populacao_nova[j][k].col );
-}
-
-void bests_cromo()
-{
-    int j;
-    j = indice_notas[TAM_POPULACAO - 1];
-    printf("\ni = %d, j = %d\n", geracao_atual, j);
-    print_cromo(j);
-}
-
-void print_arq_rota()
-{
-    unsigned long long int k;
-    unsigned long long int j;
-    FILE *ptr_arq;
-    ptr_arq = fopen("result_rota_otimizado.json","w");
-    fprintf(ptr_arq , "%s", "[");
-
-    // pos_cromo(indice_notas[TAM_POPULACAO - 1], i_geraativa, &j);
-    j = indice_notas[TAM_POPULACAO - 1];
-    for (k = 0; populacao_anterior[j][k].dado != final.dado; k++) {
-        if (populacao_anterior[j][k].dado == inicio.dado)
-            fprintf(ptr_arq , "%d,", populacao_anterior[j][k].dado);
-        else fprintf(ptr_arq , "%d,", populacao_anterior[j][k].dado);
-    }
-    fprintf(ptr_arq , "%d", populacao_anterior[j][k].dado);
-    fprintf(ptr_arq , "%s", "]\n");
-    fclose(ptr_arq);
-}
 
 int check_stop() {
 
 	return (geracao_atual == QTD_GERACAO - 1);
 }
 
-unsigned int reavalia(int _final, int j)
+unsigned int reavalia(char j)
 {
-    unsigned int peso = 0;
-    return peso = (populacao_anterior[j][0].dado != inicio.dado) ? (avaliacao_parcial_populacao[j]) * 100 : peso;
+    return (populacao_anterior[j][0].dado != inicio.dado) ? (avaliacao_parcial_populacao[j]) * 100 : 0;
 }
 
 unsigned int distancia(Coordenada inicio, Coordenada atual)
 {
-    unsigned int lin = abs(inicio.linha - atual.linha);
-    unsigned int col = abs(inicio.col - atual.col);
+    unsigned char lin = abs(inicio.linha - atual.linha);
+    unsigned char col = abs(inicio.col - atual.col);
     return pow((lin + col) * 20, 2);
 }
 
-void print_avaliacao_parcial_populacao()
-{
-    printf("\n[%s]\n", __func__);
-    for (int i = 0; i < TAM_POPULACAO; i++) {
-        printf("[Individuo %d. = %llu\n", i, avaliacao_parcial_populacao[i]);
-    }
-    printf("Soma dos pesos = %llu\n\n", soma_pesos);
-}
-
-void printf_indice_notas()
-{
-    printf("\n[%s]\n", __func__);
-    for (int i = 0; i < TAM_POPULACAO; i++)
-    {
-       print_cromo(indice_notas[i]);
-    }
-}
 
 unsigned int get_pais()
 {
@@ -186,7 +127,7 @@ unsigned int get_pais()
 
 void roleta()
 {
-    int k;
+    char k;
     fixed_point_t acumulado = 0;
     for(k = 0; k < TAM_POPULACAO; k++) {
         fx_roleta[k].porc = float_to_fixed_point((float)avaliacao_parcial_populacao[k] / soma_pesos);
@@ -300,10 +241,10 @@ bool cruzapais(unsigned int pai_1, unsigned int pai_2) {
 }
 
 void avaliar_populacao() {
-    int j, k;
+    char j, k;
     soma_pesos = 0;
     for (j = 0; j < TAM_POPULACAO; j++) {
-        unsigned long long int peso = 0;
+        unsigned int peso = 0;
          for (k = 0;  k < TAM_CROMOSSOMO; k++) {
             Coordenada pos = populacao_anterior[j][k]; //cromo-init
             if (k == 0) {
@@ -315,7 +256,7 @@ void avaliar_populacao() {
             }
             if (k != 0 && pos.dado == final.dado) {
                 avaliacao_parcial_populacao[j] += k;
-                avaliacao_parcial_populacao[j] += reavalia(k, j);
+                avaliacao_parcial_populacao[j] += reavalia(j);
                 break;
             }
         }
@@ -328,25 +269,16 @@ void avaliar_populacao() {
     ordenar_cromo(avaliacao_parcial_populacao);
     // print_avaliacao_parcial_populacao();
     // printf_indice_notas();
-    roleta(soma_pesos);
+    roleta();
     // print_roleta();
     // printf("soma = %llu\n", soma_pesos);
     if (soma_pesos >= maior_valor_soma_pesos) maior_valor_soma_pesos = soma_pesos;
 }
 
-void print_roleta()
-{
-    printf("\n[%s]\n", __func__);
-    int k;
-    for(k = 0; k < TAM_POPULACAO; k++) {
-        printf("[.%d - porc = %f ; inf = %f ; sup = %f ; p = %d\n", k + 1, fixed_point_to_float(fx_roleta[k].porc),
-        fixed_point_to_float(fx_roleta[k].inf), fixed_point_to_float(fx_roleta[k].sup), fx_roleta[k].p);
-    }
-}
-
 void ordenar_cromo(unsigned int v[TAM_POPULACAO])
 {
-    int i, j, x, p;
+    char i, j;
+    int x, p;
 	for (j = 1; j < TAM_POPULACAO; ++j) {
 		x = v[j];
 		p = indice_notas[j];
@@ -360,7 +292,7 @@ void ordenar_cromo(unsigned int v[TAM_POPULACAO])
 }
 
 void init_populacao() {
-    int p, i, j, k, cont = 0;
+    char p, i, j, k, cont = 0;
     for (p = 0; p < TAM_POPULACAO; p++) {
         k = 0; cont = 0;
         for (i = 0; i < LIN; i++) {
@@ -370,6 +302,62 @@ void init_populacao() {
                 populacao_anterior[p][k++].dado = cont++;
             }
         }
+    }
+}
+
+/// PRINTS
+
+void print_arq_rota()
+{
+    unsigned long long int k;
+    unsigned long long int j;
+    FILE *ptr_arq;
+    ptr_arq = fopen("result_rota_otimizado.json","w");
+    fprintf(ptr_arq , "%s", "[");
+
+    // pos_cromo(indice_notas[TAM_POPULACAO - 1], i_geraativa, &j);
+    j = indice_notas[TAM_POPULACAO - 1];
+    for (k = 0; populacao_anterior[j][k].dado != final.dado; k++) {
+        if (populacao_anterior[j][k].dado == inicio.dado)
+            fprintf(ptr_arq , "%d,", populacao_anterior[j][k].dado);
+        else fprintf(ptr_arq , "%d,", populacao_anterior[j][k].dado);
+    }
+    fprintf(ptr_arq , "%d", populacao_anterior[j][k].dado);
+    fprintf(ptr_arq , "%s", "]\n");
+    fclose(ptr_arq);
+}
+
+void print_cromo(int j)
+{
+    printf("\n[%s [%d] G = %d\n", __func__, j, geracao_atual);
+    int k;
+    for(k = 0; k < TAM_CROMOSSOMO; k++)
+        printf("C.%d.%d dado= %d\n", j, k + 1, populacao_anterior[j][k].dado);
+}
+
+void print_cromo_nova(int j)
+{
+    printf("\n[%s [%d] G = %d\n", __func__, j, geracao_atual);
+    int k;
+    for(k = 0; k < TAM_CROMOSSOMO; k++)
+        printf("C.%d.%d dado= %d [%d][%d]\n", j, k + 1, populacao_nova[j][k].dado,  populacao_nova[j][k].linha, populacao_nova[j][k].col );
+}
+
+void bests_cromo()
+{
+    int j;
+    j = indice_notas[TAM_POPULACAO - 1];
+    printf("\ni = %d, j = %d\n", geracao_atual, j);
+    print_cromo(j);
+}
+
+void print_roleta()
+{
+    printf("\n[%s]\n", __func__);
+    int k;
+    for(k = 0; k < TAM_POPULACAO; k++) {
+        printf("[.%d - porc = %f ; inf = %f ; sup = %f ; p = %d\n", k + 1, fixed_point_to_float(fx_roleta[k].porc),
+        fixed_point_to_float(fx_roleta[k].inf), fixed_point_to_float(fx_roleta[k].sup), fx_roleta[k].p);
     }
 }
 
@@ -387,3 +375,20 @@ void print_populacao() {
 	return;
 }
 
+void print_avaliacao_parcial_populacao()
+{
+    printf("\n[%s]\n", __func__);
+    for (int i = 0; i < TAM_POPULACAO; i++) {
+        printf("[Individuo %d. = %llu\n", i, avaliacao_parcial_populacao[i]);
+    }
+    printf("Soma dos pesos = %llu\n\n", soma_pesos);
+}
+
+void printf_indice_notas()
+{
+    printf("\n[%s]\n", __func__);
+    for (int i = 0; i < TAM_POPULACAO; i++)
+    {
+       print_cromo(indice_notas[i]);
+    }
+}
