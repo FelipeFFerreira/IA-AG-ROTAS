@@ -20,7 +20,7 @@ typedef struct {
 } Coordenada;
 
 typedef int fixed_point_t;
-#define SCALE_FACTOR 1000000
+#define SCALE_FACTOR 1000
 typedef struct {
     fixed_point_t inf;
     fixed_point_t sup;
@@ -31,22 +31,20 @@ typedef struct {
 Coordenada populacao_anterior[TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
 Coordenada populacao_nova[TAM_POPULACAO][TAM_CROMOSSOMO] = {0, 0, 0}; //Matriz de cromossomo
 
-unsigned long long int avaliacao_parcial_populacao[TAM_POPULACAO];  // Matriz de avalia��es parcial
+unsigned int avaliacao_parcial_populacao[TAM_POPULACAO];  // Matriz de avalia��es parcial
 unsigned int indice_notas[TAM_POPULACAO];
 Faixas_roleta fx_roleta[TAM_POPULACAO];
 
 // Prototipos Funcoes
-void print_mapa();
-void init_mapa();
 void embaralha_alelos();
 void init_populacao();
 void free_mapa();
 void print_populacao();
 void avaliar_populacao();
-unsigned long long int reavalia(int , int);
-unsigned long long int distancia(Coordenada, Coordenada);
+unsigned int reavalia(int , int);
+unsigned int distancia(Coordenada, Coordenada);
 void print_avaliacao_parcial_populacao();
-void ordenar_cromo(unsigned long long int v[TAM_POPULACAO]);
+void ordenar_cromo(unsigned int v[TAM_POPULACAO]);
 void reproduzir_nova_geracao();
 unsigned int get_pais();
 void roleta();
@@ -59,10 +57,9 @@ bool cruzapais(unsigned int pai_1, unsigned int pai_2);
 
 Coordenada inicio = {0, 0, 1};
 Coordenada final = {5, 3, 39};
-Coordenada** mapa;
 int geracao_atual = 0;
-unsigned long long int soma_pesos = 0;
-unsigned long long int maior_valor_soma_pesos = 0;
+unsigned int soma_pesos = 0;
+unsigned int maior_valor_soma_pesos = 0;
 
 fixed_point_t float_to_fixed_point(float x) {
     return (fixed_point_t)(x * SCALE_FACTOR);
@@ -143,13 +140,13 @@ int check_stop() {
 	return (geracao_atual == QTD_GERACAO - 1);
 }
 
-unsigned long long int reavalia(int _final, int j)
+unsigned int reavalia(int _final, int j)
 {
-    unsigned long long int peso = 0;
+    unsigned int peso = 0;
     return peso = (populacao_anterior[j][0].dado != inicio.dado) ? (avaliacao_parcial_populacao[j]) * 100 : peso;
 }
 
-unsigned long long int distancia(Coordenada inicio, Coordenada atual)
+unsigned int distancia(Coordenada inicio, Coordenada atual)
 {
     unsigned int lin = abs(inicio.linha - atual.linha);
     unsigned int col = abs(inicio.col - atual.col);
@@ -182,7 +179,7 @@ unsigned int get_pais()
             return fx_roleta[i].p;
         }
     }
-    // Essa linha nunca deve ser alcançada, mas pode ser útil para debug
+    // Essa linha nunca deve ser alcançada.
     printf("Erro: n = %.3f não está em nenhuma faixa\n", n);
     exit(10);
 }
@@ -347,7 +344,7 @@ void print_roleta()
     }
 }
 
-void ordenar_cromo(unsigned long long int v[TAM_POPULACAO])
+void ordenar_cromo(unsigned int v[TAM_POPULACAO])
 {
     int i, j, x, p;
 	for (j = 1; j < TAM_POPULACAO; ++j) {
@@ -360,18 +357,6 @@ void ordenar_cromo(unsigned long long int v[TAM_POPULACAO])
 		v[i + 1] = x;
 		indice_notas[i + 1] = p;
 	}
-}
-
-void print_mapa()
-{
-    printf("\n\n*** PRINT MAPA ***\n\n");
-    int i, j;
-    for(i = 0; i < LIN; i++) {
-        for(j = 0; j < COL; j++) {
-            printf("[%d][%d] - %d, ", mapa[i][j].linha, mapa[i][j].col, mapa[i][j].dado);
-        }
-        printf("\n");
-    }
 }
 
 void init_populacao() {
@@ -387,7 +372,6 @@ void init_populacao() {
         }
     }
 }
-
 
 void print_populacao() {
     printf("\n\n**PRINT POPULACAO***\n\n");
