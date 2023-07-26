@@ -58,7 +58,7 @@ void print_roleta();
 int check_stop();
 void print_arq_rota();
 void bests_cromo();
-bool cruzapais(unsigned int pai_1, unsigned int pai_2);
+bool cruzapais(char pai_1, char pai_2);
 
 
 
@@ -228,25 +228,25 @@ void reproduzir_nova_geracao() {
 	transfer_pop();
 }
 
-bool cruzapais(unsigned int pai_1, unsigned int pai_2) {
-	int static id_cruz = 0;
-	if (((double)rand() / RAND_MAX)<=TAXA_CRUZAMENTO) {
-        int j_pai = pai_1, k, l_mae = pai_2;
-        int pt_corte_1, pt_corte_2;
+bool cruzapais(char pai_1, char pai_2) {
+	char static id_cruz = 0;
+
+	if (((double)rand() / RAND_MAX) <= TAXA_CRUZAMENTO) {
+        char pt_corte_1, pt_corte_2;
         pt_corte_1 = rand() % (TAM_CROMOSSOMO);
         pt_corte_2 = pt_corte_1 + rand() % (TAM_CROMOSSOMO  - pt_corte_1);
-        for (k = 0; k < TAM_CROMOSSOMO; k++) {
+        for (char k = 0; k < TAM_CROMOSSOMO; k++) {
             if (k >= pt_corte_1 && k < pt_corte_2) {
-                populacao_nova[id_cruz + 1][k] = populacao_anterior[j_pai][k]; //filho mae
-                populacao_nova[id_cruz][k] = populacao_anterior[l_mae][k]; //filho pai
+                populacao_nova[id_cruz + 1][k] = populacao_anterior[pai_1][k]; //filho mae
+                populacao_nova[id_cruz][k] = populacao_anterior[pai_2][k]; //filho pai
             }
             else {
-                populacao_nova[id_cruz][k] = populacao_anterior[j_pai][k];
-                populacao_nova[id_cruz + 1][k] = populacao_anterior[l_mae][k];
+                populacao_nova[id_cruz][k] = populacao_anterior[pai_1][k];
+                populacao_nova[id_cruz + 1][k] = populacao_anterior[pai_2][k];
             }
         }
-        verifica_repeticoes(j_pai, id_cruz, pt_corte_1, pt_corte_2);
-        verifica_repeticoes(l_mae, id_cruz + 1, pt_corte_1, pt_corte_2);
+        verifica_repeticoes(pai_1, id_cruz, pt_corte_1, pt_corte_2);
+        verifica_repeticoes(pai_2, id_cruz + 1, pt_corte_1, pt_corte_2);
         id_cruz  += 2;
         id_cruz = (id_cruz == TAM_POPULACAO) ? 0 : id_cruz;
 
