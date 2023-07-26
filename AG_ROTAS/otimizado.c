@@ -72,6 +72,8 @@ float fixed_point_to_float(fixed_point_t x) {
     return ((float)x / SCALE_FACTOR);
 }
 
+int cont_rept = 0;
+
 int main()
 {
     srand((unsigned long long)time(NULL) );
@@ -83,7 +85,7 @@ int main()
         reproduzir_nova_geracao();
 
         if (check_stop()){
-            avaliar_populacao();
+            //avaliar_populacao();
             break;
 		}
     }
@@ -91,6 +93,7 @@ int main()
     bests_cromo();
     print_arq_rota();
     printf("\nMaior valor de soma pesos = %llu\n", maior_valor_soma_pesos);
+    printf("Cont rept = %d\n", cont_rept);
     return 0;
 }
 
@@ -131,33 +134,6 @@ void roleta()
     }
 }
 
-void verifica_repeticoes(unsigned int j_pai, int j_filho, int pt_corte_1, int pt_corte_2)
-{
-    int k, k1;
-    bool cked_1, cked_2;
-    do {
-        cked_1 = true;
-        cked_2 = true;
-        for (k = TAM_CROMOSSOMO - 1; k >= pt_corte_2; k--) {
-            for (k1 = pt_corte_1; k1 < pt_corte_2; k1++) {
-                if (populacao_nova[j_filho][k].dado == populacao_nova[j_filho][k1].dado){//, comparar end ou dado?
-                     populacao_nova[j_filho][k] = populacao_anterior[j_pai][k1];
-                    cked_1 = false;
-                    break;
-                }
-            }
-        }
-        for (k = 0; k < pt_corte_1; k++){
-            for (k1 = pt_corte_1; k1 < pt_corte_2; k1++){
-                if (populacao_nova[j_filho][k].dado == populacao_nova[j_filho][k1].dado){//, comparar end ou dado?
-                     populacao_nova[j_filho][k] = populacao_anterior[j_pai][k1];
-                    cked_2 = false;
-                    break;
-                }
-            }
-        }
-    } while(!(cked_1 && cked_2));
-}
 
 void transfer_pop()
 {
@@ -254,6 +230,43 @@ bool cruzapais(char pai_1, char pai_2) {
     }
     return false;
 }
+
+void verifica_repeticoes(unsigned int j_pai, int j_filho, int pt_corte_1, int pt_corte_2)
+{
+    int k, k1, cont = 0;
+    bool cked_1 = false, cked_2 = false;
+
+    while (!cked_1 || !cked_2) {
+        cked_1 = true;
+        cked_2 = true;
+
+        for (k = TAM_CROMOSSOMO - 1; k >= pt_corte_2; k--) {
+            for (k1 = pt_corte_1; k1 < pt_corte_2; k1++) {
+                if (populacao_nova[j_filho][k].dado == populacao_nova[j_filho][k1].dado) {
+                    populacao_nova[j_filho][k] = populacao_anterior[j_pai][k1];
+                    cked_1 = false;
+                    break;
+                }
+            }
+        }
+
+        for (k = 0; k < pt_corte_1; k++) {
+            for (k1 = pt_corte_1; k1 < pt_corte_2; k1++) {
+                if (populacao_nova[j_filho][k].dado == populacao_nova[j_filho][k1].dado) {
+                    populacao_nova[j_filho][k] = populacao_anterior[j_pai][k1];
+                    cked_2 = false;
+                    break;
+                }
+            }
+        }
+        cont++;
+    }
+
+    if (cont >= cont_rept) cont_rept = cont;
+}
+
+
+
 
 void avaliar_populacao() {
     char j, k;
